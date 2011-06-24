@@ -11,7 +11,7 @@ if (!$con)
         die('Could not connect: ' . mysql_error());
 }
 mysql_select_db('site1',$con);
-$sqlmt = "SELECT * from ddetails limit 0,20";
+$sqlmt = "SELECT * from ddetails";
 $rsmd = mysql_query($sqlmt) or die($sqlmt. mysql_error());
 while($rowmd = mysql_fetch_array($rsmd))
 {
@@ -21,21 +21,23 @@ print_r("\n".$rowmd['id']);
 // Construct the new node object.
 
 $node = new stdClass();
+//print_r("k ".$node->nid);
 // Your script will probably pull this information from a database.
+//$node->nid=10000000;
 $node->title = "".(trim($rowmd['fname']))."";
 $node->body = "";
 $node->type = 'obit_user_links';   // Your specified content type
 $node->created = time();
 $node->changed = $node->created;
 $node->status = 1;
-$node->promote = 0;
+$node->promote = 1;
 $node->sticky = 0;
 $node->format = 1;       // Filtered HTML
 $node->uid = 1;          // UID of content owner
 $node->language = 'en';
-$node->field_obit_user_url[0]['url'] = "obituary/user/show/template?id=".trim($rowmd['obit_member_id'])."";
-$node->field_obit_user_url[0]['title'] = "".(trim($rowmd['fname']))." ".(trim($rowmd['mname']))." ".(trim($rowmd['lname']))."";
-$node->field_obit_user_url[0]['attributes'] =""; 
+//$node->field_obit_user_url[0]['url'] = "obituary/user/show/template?id=".trim($rowmd['obit_member_id'])."";
+//$node->field_obit_user_url[0]['title'] = "".(trim($rowmd['fname']))." ".(trim($rowmd['mname']))." ".(trim($rowmd['lname']))."";
+//$node->field_obit_user_url[0]['attributes'] =""; 
 $node->field_fname[0]['value'] = "".(trim($rowmd['fname']))."";
 $node->field_mname[0]['value'] = "".(trim($rowmd['mname']))."";
 $node->field_lname[0]['value'] = "".(trim($rowmd['lname']))."";
