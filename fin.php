@@ -2,14 +2,14 @@
 require './includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 $_SERVER['REMOTE_ADDR'] = '10.0.1.4';  // to prvent the warning Undefined index: REMOTE_ADDR in /home/kunal/drupal/includes/bootstrap.inc on line 1317
-
+$lid='1';      //SET LOCATION ID ACCORDINGLY
 $con = mysql_connect("localhost","root","kunalmysql");
 if (!$con)
 {
         die('Could not connect: ' . mysql_error());
 }
 mysql_select_db('site2',$con);
-$sqlmt = "SELECT * from ddetails";
+$sqlmt = "SELECT * from ddetails where location_id = '$lid'";
 $rsmd = mysql_query($sqlmt) or die($sqlmt. mysql_error());
 print_r("start: ".strftime('%c')."");
 while($rowmd = mysql_fetch_array($rsmd))
