@@ -1,8 +1,8 @@
 <?php
 require './includes/bootstrap.inc';
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-$_SERVER['REMOTE_ADDR'] = '10.0.1.4';  // to prvent the warning Undefined index: REMOTE_ADDR in /home/kunal/drupal/includes/bootstrap.inc on line 1317
-$lid  = 7;                    // SET LOCATION ID
+//$_SERVER['REMOTE_ADDR'] = '10.0.1.4';  // to prvent the warning Undefined index: REMOTE_ADDR in /home/kunal/drupal/includes/bootstrap.inc on line 1317
+$lid  = 1;                    // SET LOCATION ID
 $con = mysql_connect("localhost","root","kunalmysql");
 if (!$con)
 {
@@ -35,7 +35,7 @@ $userinfo = array(
       $account = "Error saving user account!";
     }
     else
-	echo "done";
+	echo "\n".$rowmd['id'];
 }
 
 
