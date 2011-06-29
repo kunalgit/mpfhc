@@ -20,7 +20,8 @@ mysql_query($mig2) or die($mig2. mysql_error());
 mysql_select_db('site2',$con);//DATABASE NAME IS SITE2
 $sqlmt = "SELECT * from ddetails where location_id = '$lid'";
 $rsmd = mysql_query($sqlmt) or die($sqlmt. mysql_error());
-print_r("start: ".strftime('%c')."");
+print_r("start: ".strftime('%c')."\n");
+$r=0;
 while($rowmd = mysql_fetch_array($rsmd))
 {
 // Construct the new node object.
@@ -84,9 +85,11 @@ $node->field_display[0]['value'] = "".(trim($rowmd['display']))."";
 $node->field_obit_member_id[0]['value'] = "".trim($rowmd['obit_member_id'])."";
 // If known, the taxonomy TID values can be added as an array.
 $node->taxonomy = array(2,3,1,);
+$r=$r+1;
+print_r("obit migrated : ".$r."\n");
 node_save($node);
 }
-print_r("obituaries migrated".strftime('%c')."");
+print_r("obituaries migrated   ".strftime('%c')."");
 $con1 = mysql_connect("localhost","root","kunalmysql");
 if (!$con1)
 {
@@ -98,20 +101,20 @@ $rsmd2 = mysql_query($sqlmt2) or die($sqlmt2. mysql_error());
 $r = 0;
 $oldCode = "";
 $r=100;//row id for url aliases 
-print_r("url aliases initiated ".strftime('%c')."");
+print_r("\nurl aliases initiated   ".strftime('%c')."\n");
 while($rowmd2 = mysql_fetch_array($rsmd2))
 {
 $r=$r+1;
 $sqlnp = "INSERT INTO url_alias (pid,src,dst)VALUES ( $r,'node/".trim($rowmd2['nid'])."','obituary/user/show/template?id=".trim($rowmd2['field_obit_member_id_value'])."')";
 $ins = mysql_query($sqlnp) or die($sqlnp." :: ".mysql_error());
 }
-print_r("urls done".strftime('%c')."");
+print_r("urls done    ".strftime('%c')."\n");
 
 $str= 's:36:"obituary/user/show/template?id=[nid]";';
 $sqlvt = "UPDATE variable SET value = '".mysql_real_escape_string($str)."' WHERE name = 'pathauto_node_obit_user_links_pattern'";
 $ins = mysql_query($sqlvt) or die($sqlvt." :: ".mysql_error());
-print_r("url rewrite rule also added: ".strftime('%c')."");
+print_r("url rewrite rule also added: ".strftime('%c')."\n");
 $mig4 = "DROP TABLE IF EXISTS `ddetails`";
 mysql_query($mig4);
 ?>
-
+COMPLETED!!!!!!!

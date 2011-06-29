@@ -10,12 +10,24 @@ if (!$con)
 {
         die('Could not connect: ' . mysql_error());
 }
+
+mysql_select_db('',$con);
+$mig = "DROP TABLE IF EXISTS `site2`.`messages`";
+
+$mig1 = "CREATE TABLE `site2`.`messages` LIKE `CManager_development`.`messages`";
+$mig2 = "INSERT INTO `site2`.`messages` SELECT * FROM `CManager_development`.`messages`";
+mysql_query($mig) or die($mig. mysql_error());
+mysql_query($mig1) or die($mig1. mysql_error());
+mysql_query($mig2) or die($mig2. mysql_error());
+$r=0;
+
 mysql_select_db('site2',$con);
 $sqlmt = "SELECT * from messages";
 $rsmd = mysql_query($sqlmt) or die($sqlmt. mysql_error());
 print_r("start: ".strftime('%c')."");
 while($rowmd = mysql_fetch_array($rsmd))
 {
+
 //print_r($rowmd);
 //print_r("\n".$rowmd['id']);
 
@@ -50,7 +62,9 @@ $rowmd2 = mysql_fetch_array($rsmd2);
 if(empty($rowmd2)){
 continue;
 }
-print_r(" ".$rowmd['id']." ");
+$r=$r+1;
+print_r("comment inserted : ".$r."\n");
+
 node_save($node);
 
 //print_r(trim($rowmd['obit_member_id']));
@@ -60,7 +74,11 @@ $rsmd1 = mysql_query($sqlmt1) or die($sqlmt1. mysql_error());
 
 $sqlmt3 = "UPDATE node_comment_statistics SET comment_count = comment_count + 1 WHERE nid ='".trim($rowmd2['nid'])."'";
 mysql_query($sqlmt3);
+
 }
 print_r("end: ".strftime('%c')."");
+$mig = "DROP TABLE IF EXISTS `site2`.`messages`";
+mysql_query($mig);
+
 ?>
 DONE

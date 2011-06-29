@@ -8,10 +8,20 @@ if (!$con)
 {
         die('Could not connect: ' . mysql_error());
 }
+mysql_select_db('',$con);
+$mig = "DROP TABLE IF EXISTS `site2`.`obit_members`";
+$mig1 = "CREATE TABLE `site2`.`obit_members` LIKE `CManager_development`.`obit_members`";
+$mig2 = "INSERT INTO `site2`.`obit_members` SELECT * FROM `CManager_development`.`obit_members`";
+mysql_query($mig) or die($mig. mysql_error());
+mysql_query($mig1) or die($mig1. mysql_error());
+mysql_query($mig2) or die($mig2. mysql_error());
+
+
 mysql_select_db('site2',$con);
 $sqlmt = "SELECT * from obit_members where location_id = '$lid'";
 $rsmd = mysql_query($sqlmt) or die($sqlmt. mysql_error());
 //print_r("start: ".strftime('%c')."");
+$r=0;
 while($rowmd = mysql_fetch_array($rsmd))
 {
 $mysqltime= "".(trim($rowmd['created_at']))."";
@@ -35,9 +45,13 @@ $userinfo = array(
       $account = "Error saving user account!";
     }
     else
-	echo "\n".$rowmd['id'];
+	{
+	$r=$r+1;
+	echo "user migrated : ".$r."\n";
+	}
 }
 
-
+$mig4 = "DROP TABLE IF EXISTS `site2`.`obit_members`";
+mysql_query($mig4);
 ?>
-
+DONE!!
