@@ -1,0 +1,75 @@
+<?php
+/* Add our new field to the content types and/or comments */
+function yourmodule_form_alter(&$form, $form_state, $form_id) { // form override
+  if ($form_id == 'forum_node_form') { // add field to forum content type
+    unset($form['taxonomy']['5']['#options'][4]);
+    $form['cb2vsn'] = array(
+    '#type' => 'hidden', // I have used hidden fields here, because this is what I needed, you may also need to change this to suit your needs
+    '#id' => t('edit-field-cb2vsn-0-value'),
+    '#default_value' => '',
+    );
+  }
+  if ($form_id == 'comment_form') { // add field to comment content type
+    $form['cb2vsn'] = array(
+    '#type' => 'hidden', // I have used hidden fields here, because this is what I needed, you may also need to change this to suit your needs
+    '#id' => t('edit-field-cb2vsn-0-value'),
+    '#default_value' => '',
+    );
+  }
+}
+
+/* set up permissions */
+function yourmodule_perm() {
+  return array('view your field');
+}
+
+/* operations for handling the values inserted into a node's form */
+function yourmodule_nodeapi(&$node, $op) {
+  switch ($op) {
+    case 'insert': // insert in the database
+      $cb2sig = $node->cb2vsn; // here is my field as created in the last form_alter()
+      db_query("INSERT INTO {yourmodule} (xid, type, val) VALUES(%d, '%s', '%s')", $node->nid, 'node', $cb2sig);
+      break;
+    case 'view': // get it from the database for display
+      if (user_access('view your field')) {
+        $result = db_fetch_object(db_query("SELECT val FROM {yourmodule} WHERE type='node' AND xid = %d", $node->nid));
+        if ($result->val) {
+          $node->yourfield = $result->val;
+        }
+      }
+      break;
+  }
+}
+
+/* operations for handling the values inserted into a comment's form */
+function yourmodule_comment(&$comment, $op) {
+  switch ($op) {
+    case 'insert': // insert in the database
+      $cb2sig = $comment['cb2vsn']; // here is my field as created in the last form_alter()
+      db_query("INSERT INTO {yourmodule} (xid, type, val) VALUES(%d, '%s', '%s')", $comment['cid'], 'comment', $cb2sig);
+      break;
+    case 'view': // get it from the database for display
+      if (user_access('view your field')) {
+        $result = db_fetch_object(db_query("SELECT val FROM {yourmodule} WHERE type='comment' AND xid = %d", $comment->cid));
+        $comment->yourfield = $result->val;
+      }
+      break;
+  }
+}
+
+function commentsmodify_views_pre_execute(&$view) { 
+   if(trim($view->name) == "obit_links_view") {
+     $view->build_info['query'] = "SELECT node.nid AS nid, concat_ws(' ',node_data_field_display.field_fname_value, node_data_field_display.field_mname_value,node_data_field_display.field_lname_value) AS node_data_field_display_field_fname_value,".
+                                "node.type AS node_type,node.vid AS node_vid, node_data_field_display.field_mname_value AS node_data_field_display_field_mname_value,".
+                                "node_data_field_display.field_lname_value AS node_data_field_display_field_lname_value," .
+                                "node_data_field_display.field_created_at_value AS node_data_field_display_field_created_at_value," .
+                                "node_data_field_created_at.field_created_at_value AS node_data_field_created_at_field_created_at_value" .
+                                " FROM node node LEFT JOIN content_type_obit_user_links node_data_field_display ON node.vid = node_data_field_display.vid" .
+                                " LEFT JOIN content_type_obit_user_links node_data_field_created_at ON node.vid = node_data_field_created_at.vid" .
+                               " WHERE (node.type in ('obit_user_links')) AND (node_data_field_display.field_display_value = 1)" .
+                               " ORDER BY node_data_field_created_at_field_created_at_value DESC";
+
+
+   }
+}
+?>
