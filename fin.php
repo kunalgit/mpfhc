@@ -8,16 +8,22 @@ if (!$con)
 {
         die('Could not connect: ' . mysql_error());
 }
-mysql_select_db('site2',$con);
+
+mysql_select_db('',$con);
+$mig = "DROP TABLE IF EXISTS `site2`.`ddetails`";
+$mig1 = "CREATE TABLE `site2`.`ddetails` LIKE `CManager_development`.`details`";
+$mig2 = "INSERT INTO `site2`.`ddetails` SELECT * FROM `CManager_development`.`details`";
+mysql_query($mig) or die($mig. mysql_error());
+mysql_query($mig1) or die($mig1. mysql_error());
+mysql_query($mig2) or die($mig2. mysql_error());
+
+mysql_select_db('site2',$con);//DATABASE NAME IS SITE2
 $sqlmt = "SELECT * from ddetails where location_id = '$lid'";
 $rsmd = mysql_query($sqlmt) or die($sqlmt. mysql_error());
 print_r("start: ".strftime('%c')."");
 while($rowmd = mysql_fetch_array($rsmd))
 {
-//print_r($rowmd);
-//print_r("\n".$rowmd['id']);
 // Construct the new node object.
-
 $node = new stdClass();
 // Your script will probably pull this information from a database.
 $node->title = "".(trim($rowmd['fname']))."";
@@ -91,34 +97,21 @@ $sqlmt2 = "SELECT nid,field_obit_member_id_value from content_type_obit_user_lin
 $rsmd2 = mysql_query($sqlmt2) or die($sqlmt2. mysql_error());
 $r = 0;
 $oldCode = "";
-//echo "<pre>";
-//$rowmd2 = mysql_fetch_array($rsmd2);
-//print_r($rowmd2['id']);
-$r=100;
+$r=100;//row id for url aliases 
 print_r("url aliases initiated ".strftime('%c')."");
 while($rowmd2 = mysql_fetch_array($rsmd2))
 {
-//print_r($rowmd2);
-//print_r("\n".$rowmd2['nid']);
-
 $r=$r+1;
 $sqlnp = "INSERT INTO url_alias (pid,src,dst)VALUES ( $r,'node/".trim($rowmd2['nid'])."','obituary/user/show/template?id=".trim($rowmd2['field_obit_member_id_value'])."')";
 $ins = mysql_query($sqlnp) or die($sqlnp." :: ".mysql_error());
-
-
-//$sqlnp2 = "INSERT INTO node (nid,vid,type,title,uid,status)VALUES ( $r,$r,'obit_user_links','".mysql_real_escape_string(trim($rowmd['fname']))."','1','1')";
-//$ins2 = mysql_query($sqlnp2) or die($sqlnp." :: ".mysql_error());
-
 }
 print_r("urls done".strftime('%c')."");
-
-
-//drush en pathauto;
 
 $str= 's:36:"obituary/user/show/template?id=[nid]";';
 $sqlvt = "UPDATE variable SET value = '".mysql_real_escape_string($str)."' WHERE name = 'pathauto_node_obit_user_links_pattern'";
 $ins = mysql_query($sqlvt) or die($sqlvt." :: ".mysql_error());
 print_r("url rewrite rule also added: ".strftime('%c')."");
-
+$mig4 = "DROP TABLE IF EXISTS `ddetails`";
+mysql_query($mig4);
 ?>
 
